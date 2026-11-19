@@ -1,0 +1,46 @@
+
+#launch simulation 
+cd ~/dev_ws
+source /opt/ros/humble/setup.bash
+colcon build --symlink-install --packages-select articubot_one
+source install/setup.bash
+ros2 launch articubot_one launch_sim.launch.py
+
+
+#source there terminal with ros and articubot packgaes if needed
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+
+#to clear any  reminaing procees or job  left by the simulation if not closed properly
+jobs -l
+fg%1 #to kill jobs
+
+
+
+
+
+#laumch slam tool box 
+source /opt/ros/humble/setup.bash
+source ~/dev_ws/install/setup.bash
+
+ros2 launch slam_toolbox online_async_launch.py \
+slam_params_file:=$HOME/dev_ws/src/articubot_one/config/mapper_params_online_async.yaml \
+use_sim_time:=true
+
+
+#launch rviz2
+source /opt/ros/humble/setup.bash
+source ~/dev_ws/install/setup.bash
+rviz2
+
+#saves map in /maps
+ros2 run nav2_map_server map_saver_cli -f ~/dev_ws/maps/map_name
+
+#localisation py 
+cd ~/dev_ws && source install/setup.bash
+ros2 launch nav2_bringup localization_launch.py map:=$HOME/dev_ws/maps/ugv_map.yaml params_file:=$HOME/dev_ws/src/articubot_one/config/nav2/nav2_params.yaml use_sim_time:=true
+
+
+#navigatioon launch py 
+cd ~/dev_ws && source install/setup.bash
+ros2 launch nav2_bringup navigation_launch.py params_file:=$HOME/dev_ws/src/articubot_one/config/nav2/nav2_params.yaml use_sim_time:=true

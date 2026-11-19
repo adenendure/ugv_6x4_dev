@@ -1,0 +1,32 @@
+
+
+#build the workpacse by colon and start gazebo in TERMINAL 1
+
+cd ~/dev_ws
+source /opt/ros/humble/setup.bash
+colcon build --symlink-install --packages-select articubot_one
+source install/setup.bash
+ros2 launch articubot_one launch_sim.launch.py
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#start the mapserver which load the maps abd start the ACML server in TERMINAL 2
+
+cd ~/dev_ws && source install/setup.bash
+ros2 launch nav2_bringup localization_launch.py map:=$HOME/dev_ws/maps/ugv_map.yaml params_file:=$HOME/dev_ws/src/articubot_one/config/nav2/nav2_params.yaml use_sim_time:=true
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#start RVIZ2 IN TERMINAL 3
+
+cd ~/dev_ws && source install/setup.bash
+rviz2 --ros-args -p use_sim_time:=true
+
+STEPS IN RVIZ 
+1) Select the fixed frame and type map
+2) ADD map from the visual diaplay menu 
+3) select the map menu. In the map topic type /map and in Durability Options select transcint_local
+4) give the rover 2D pose estimate based on how the rover is in gazebo simulation 
+5)OPTIONAL: To see the global cost map of the obscticales in the map topic instaed of /map. type /global_costmap/costmap and and add color to cost map 
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#start navigation launch in terminal 4
+cd ~/dev_ws && source install/setup.bash
+ros2 launch nav2_bringup navigation_launch.py params_file:=$HOME/dev_ws/src/articubot_one/config/nav2/nav2_params.yaml use_sim_time:=true
